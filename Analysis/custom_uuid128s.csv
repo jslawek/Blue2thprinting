@@ -33,7 +33,7 @@
 
 "5052494d2dab034169726f6861424c45","ASSOCIATED WITH: GATT_Service: Multiple vendors' headphones"
 "434841522dab314169726f6861424c45","ASSOCIATED WITH: GATT_Characteristic: Multiple vendors' headphones (below 5052494d2dab034169726f6861424c45 service)"
-"434841522dab324169726f6861424c45","ASSOCIATED WITH: GATT_Characteristic: Multiple vendors' headphones (below 5052494d2dab034169726f6861424c45 service)
+"434841522dab324169726f6861424c45","ASSOCIATED WITH: GATT_Characteristic: Multiple vendors' headphones (below 5052494d2dab034169726f6861424c45 service)"
 
 "abbaff00e56a484cb8328b17cf6cbfe8","ASSOCIATED WITH: ADV_IND, GATT_Service: Fitbit: Charge 4, Charge 5, Inspire 3, Ionic, Luxe, Sense, Versa, Versa 2, Versa 3, Versa Lite"
 "abbaff01e56a484cb8328b17cf6cbfe8","ASSOCIATED WITH: GATT_Characteristic: Charge 4, Charge 5, Inspire 3, Luxe, Sense, Sense 2, Versa, Versa 2, Versa 3, Versa 4"
@@ -98,7 +98,7 @@
 "d417c0289818435499d12ac09d074591","ASSOCIATED WITH: GATT_Characteristic: Bose (('Readable' 'Writable without response' 'Writable' 'Notify') characteristic under 0xfebe service)"
 "234bfbd5e3b34536a3fe723620d4b78d","ASSOCIATED WITH: GATT_Characteristic: Bose (('Writable') characteristic under 0xfebe service)"
 "c65b8f2faee24c89b758bc4892d6f2d8","ASSOCIATED WITH: GATT_Characteristic: Bose (('Readable' 'Writable without response' 'Writable' 'Notify'') characteristic under 0xfebe service)"
-"eecb95ddbefe40d698c70651d2d09ba9","ASSOCIATED WITH: GATT_Characteristic: Bose (('Writable' 'Notify') characteristic under 0xfebe service)
+"eecb95ddbefe40d698c70651d2d09ba9","ASSOCIATED WITH: GATT_Characteristic: Bose (('Writable' 'Notify') characteristic under 0xfebe service)"
 
 "569a1101b87f490c92cb11ba5ea5167c","ASSOCIATED WITH: ADV_IND, GATT_Service: ModuleMakerPrint=Laird: Laird virtual serial port (https://www.mouser.com/pdfDocs/ApplicationNoteLairdBLESerialPortServicev1_0_0.pdf)"
 "569a2000b87f490c92cb11ba5ea5167c","ASSOCIATED WITH: GATT_Characteristic: ModuleMakerPrint=Laird: Laird virtual serial port TX_FIFO Characteristic, under 569a1101b87f490c92cb11ba5ea5167c service (https://www.mouser.com/pdfDocs/ApplicationNoteLairdBLESerialPortServicev1_0_0.pdf)"
@@ -140,7 +140,11 @@
 "8EC90002F3154F609FB8838830DAEA50","ASSOCIATED WITH: GATT_Characteristic: ChipMakerPrint=Nordic: Nordic Secure DFU Service,DFU Packet Characteristic, (https://infocenter.nordicsemi.com/index.jsp?topic=%2Fsdk_nrf5_v16.0.0%2Flib_dfu_transport_ble.html)"
 
 # Also note: I saw one device (c4:5b:be:ae:59:22) which had an OUI of Espressif. There was only one though, so maybe just an error in recording whether it was a public BDADDR or not? (Or of course some vendors just pick whatever they want...)
-"f000ffc004514000b000000000000000","ASSOCIATED WITH: GATT_Service: ChipMakerPrint=TexasInstruments: TI Firmware update (According to https://github.com/WebBluetoothCG/registries/blob/master/gatt_blocklist.txt but its citation doesn't seem to show it?."
+"f000ffc004514000b000000000000000","ASSOCIATED WITH: GATT_Service: ChipMakerPrint=TexasInstruments: TI OTA Firmware update (https://software-dl.ti.com/lprf/simplelink_cc2640r2_sdk/1.35.00.33/exports/docs/ble5stack/ble_user_guide/html/oad/oad_concepts.html#oad-service-0xffc0)"
+"f000ffc104514000b000000000000000","ASSOCIATED WITH: GATT_Characteristic: ChipMakerPrint=TexasInstruments: TI OTA Firmware update (https://software-dl.ti.com/lprf/simplelink_cc2640r2_sdk/1.35.00.33/exports/docs/ble5stack/ble_user_guide/html/oad/oad_concepts.html#oad-service-0xffc0)"
+"f000ffc204514000b000000000000000","ASSOCIATED WITH: GATT_Characteristic: ChipMakerPrint=TexasInstruments: TI OTA Firmware update (https://software-dl.ti.com/lprf/simplelink_cc2640r2_sdk/1.35.00.33/exports/docs/ble5stack/ble_user_guide/html/oad/oad_concepts.html#oad-service-0xffc0)"
+"f000ffc304514000b000000000000000","ASSOCIATED WITH: GATT_Characteristic: ChipMakerPrint=TexasInstruments: TI OTA Firmware update (https://software-dl.ti.com/lprf/simplelink_cc2640r2_sdk/1.35.00.33/exports/docs/ble5stack/ble_user_guide/html/oad/oad_concepts.html#oad-service-0xffc0)"
+"f000ffc404514000b000000000000000","ASSOCIATED WITH: GATT_Characteristic: ChipMakerPrint=TexasInstruments: TI OTA Firmware update (https://software-dl.ti.com/lprf/simplelink_cc2640r2_sdk/1.35.00.33/exports/docs/ble5stack/ble_user_guide/html/oad/oad_concepts.html#oad-service-0xffc0)"
 
 "9aa4730fb25c4cc3b821c931559fc196","Claimed to be Apple Watch related here: https://github.com/davidgyoung/BackgroundAdvertiser/blob/master/BackgroundAdvertiser/OverflowArea/OverflowAreaUtils.swift TODO: look into more"
 
@@ -170,3 +174,15 @@
 "a9da60400823499594ec9ce41ca28833","ASSOCIATED WITH: GATT_Characteristic: Silicon Labs: BGX: Peripheral Receive (Rx) (https://docs.silabs.com/gecko-os/1/bgx/latest/ble-services)"
 "a73e9a10628f4494a09912efaf72258f","ASSOCIATED WITH: GATT_Characteristic: Silicon Labs: BGX: Peripheral Transmit (Tx) (https://docs.silabs.com/gecko-os/1/bgx/latest/ble-services)"
 "75a9f022af034e41b4bc9de90a47d50b","ASSOCIATED WITH: GATT_Characteristic: Silicon Labs: BGX: Stream Mode (Mode) (https://docs.silabs.com/gecko-os/1/bgx/latest/ble-services)"
+
+"2dd100101c37452d8979d1b4a787d0a4","ASSOCIATED WITH: ADV_IND, GATT_Service: Dyson Limited: Air purifying fan (https://youtu.be/Z65QgA_BKgc?t=45)"
+"2dd100111c37452d8979d1b4a787d0a4","ASSOCIATED WITH: GATT_Characteristic: Dyson Limited: Air purifying fan (https://youtu.be/Z65QgA_BKgc?t=45)"
+"2dd100131c37452d8979d1b4a787d0a4","ASSOCIATED WITH: GATT_Characteristic: Dyson Limited: Air purifying fan (https://youtu.be/Z65QgA_BKgc?t=45)"
+
+"95665a00870411e5960c0002a5d5c51b","ASSOCIATED WITH: ADV_IND: VXi (headset maker) based on OUIs in my data for matches. From BLEScope: com.imptt.proptt, com.cotap.android, com.stagrp.instantconnect6, com.loudtalks, com.mysay.b"
+
+"cbbfe0e1f7f3420684e084cbb3d09dfc","ASSOCIATED WITH: ADV_IND: Android TV Remote? () https://android-review.linaro.org/plugins/gitiles/platform/cts/+/8bb61c456cb5dcc0c1f48c7651c98679ca384dde%5E%21/"
+
+"1D14D6EEFD634FA1BFA48F47B42119F0","ASSOCIATED WITH: GATT_Service: Silicon Labs: OTA Firmware Update (https://blog.quarkslab.com/breaking-secur-eboot-on-the-silicon-labs-gecko-platform.html)"
+"F7BF3564FB6D4E5388A45E37E0326063","ASSOCIATED WITH: GATT_Characteristic: Silicon Labs: OTA Firmware Update Control Attribute (https://blog.quarkslab.com/breaking-secure-boot-on-the-silicon-labs-gecko-platform.html)"
+"984227F334FC4045A5D02C581F81A153","ASSOCIATED WITH: GATT_Characteristic: Silicon Labs: OTA Firmware Update Data Attribute (https://blog.quarkslab.com/breaking-secure-boot-on-the-silicon-labs-gecko-platform.html)"

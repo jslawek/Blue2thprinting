@@ -297,6 +297,272 @@ def get_bdaddrs_by_name_regex(nameregex):
     return bdaddr_hash.keys()
 
 
+def get_bdaddrs_by_bdaddr_regex(bdaddrregex):
+    print(bdaddrregex)
+    bdaddr_hash = {} # Use hash to de-duplicate between all results from all tables
+    bdaddrs = []
+
+    bdaddr_query = (
+        f"SELECT DISTINCT t.device_bdaddr "
+        f"FROM ( "
+        f"    SELECT '{bdaddrregex}' AS bdaddr_prefix "
+        f") AS prefix "
+        f"CROSS JOIN ( "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_appearance WHERE bdaddr_random = 0" # TODO: It would be better if we added a parameter to allow the caller to specify if they want to consider random addresses or not
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_CoD WHERE bdaddr_random = 0"
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_connect_interval WHERE bdaddr_random = 0"
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_flags WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_mf_specific WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_name WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_other_le_bdaddr WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_public_target_bdaddr WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_tx_power WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_URI WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_UUID128_service_solicit WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_UUID128s WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_UUID16_service_solicit WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM LE_bdaddr_to_UUID16s WHERE bdaddr_random = 0 "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM EIR_bdaddr_to_DevID "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM EIR_bdaddr_to_flags "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM EIR_bdaddr_to_mf_specific "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM EIR_bdaddr_to_name "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM EIR_bdaddr_to_PSRM_CoD "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM EIR_bdaddr_to_tx_power "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM EIR_bdaddr_to_UUID128s "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM EIR_bdaddr_to_UUID16s "
+        f"    UNION ALL "
+        f"    SELECT device_bdaddr FROM EIR_bdaddr_to_UUID32s "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM BLE2th_LL_FEATUREs "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM BLE2th_LL_LENGTHs "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM BLE2th_LL_PHYs "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM BLE2th_LL_PING_RSP "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM BLE2th_LL_UNKNOWN_RSP "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM BLE2th_LL_VERSION_IND "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM BTC2th_LMP_features_res "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM BTC2th_LMP_name_res "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM BTC2th_LMP_version_res "
+        f"    UNION ALL "
+        f"    SELECT CONVERT(device_bdaddr USING utf8) FROM GATT_services "
+        f") AS t "
+        f"WHERE t.device_bdaddr LIKE CONCAT(prefix.bdaddr_prefix, '%');"
+    )
+
+    bdaddr_result = execute_query(bdaddr_query)
+    for (bdaddr,) in bdaddr_result:
+        bdaddr_hash[bdaddr] = 1
+
+    print(f"get_bdaddrs_by_bdaddr_regex: {len(bdaddr_result)} results found across all tables")
+    print(f"get_bdaddrs_by_bdaddr_regex: bdaddr_hash = {bdaddr_hash}")
+
+    return bdaddr_hash.keys()
+
+def get_uuid16_stats(arg):
+    seen_btc_uuid16s_hash = {}
+    seen_le_uuid16s_hash = {}
+    company_uuid_count = 0
+
+    #Too lazy to change indentation in nano!
+    if(1):
+
+        ################################################
+        # Get the data for BTC devices from the database
+        ################################################
+
+        eir_uuid16_query = f"SELECT str_UUID16s FROM EIR_bdaddr_to_UUID16s"
+        eir_uuid16_result = execute_query(eir_uuid16_query)
+        if(len(eir_uuid16_result) != 0):
+            for (str_UUID16s,) in eir_uuid16_result:
+                uuid16s = str_UUID16s.split(',')
+                for uuid16 in uuid16s:
+                    if(uuid16 in seen_btc_uuid16s_hash):
+                        seen_btc_uuid16s_hash[uuid16] += 1
+                    else:
+                        seen_btc_uuid16s_hash[uuid16] = 1
+
+            print("----= BLUETOOTH CLASSIC RESULTS =----")
+            print(f"{len(eir_uuid16_result)} rows of data found in EIR_bdaddr_to_UUID16s")
+            print(f"{len(seen_btc_uuid16s_hash)} unique UUID16s found")
+#            print(seen_btc_uuid16s_hash)
+            sorted_items = sorted(seen_btc_uuid16s_hash.items(), key=lambda item: item[1], reverse=True)
+            print(f"count \t uuid16 \t company")
+            for item in sorted_items:
+                (uuid16,count) = item
+#                print(bt_member_UUID16s_to_names)
+#                print(item)
+#                print(uuid16)
+#                print(count)
+                try:
+                    decimal_uuid16 = int(uuid16,16)
+                except ValueError:
+                    if(arg != "quiet"): print(f"Skipping '{uuid16}', it can't be converted to an integer")
+                    continue
+
+                if(decimal_uuid16 in bt_member_UUID16s_to_names.keys()):
+                    print(f"{count} \t {uuid16} \t {bt_member_UUID16s_to_names[int(uuid16,16)]}")
+                    company_uuid_count += 1
+            print(f"*** {company_uuid_count} UUID16s matched a company name ***")
+
+
+            ################################################
+            # Get the data for LE devices from the database
+            ################################################
+
+            le_uuid16_query = f"SELECT str_UUID16s FROM LE_bdaddr_to_UUID16s"
+            le_uuid16_result = execute_query(le_uuid16_query)
+            if(len(le_uuid16_result) != 0):
+                for (str_UUID16s,) in le_uuid16_result:
+                    if(isinstance(str_UUID16s, str)):
+                        uuid16s = str_UUID16s.split(',')
+                        for uuid16 in uuid16s:
+                            if(uuid16 in seen_le_uuid16s_hash):
+                                seen_le_uuid16s_hash[uuid16] += 1
+                            else:
+                               seen_le_uuid16s_hash[uuid16] = 1
+
+            company_uuid_count = 0
+            print()
+            print("----= BLUETOOTH LOW ENERGY RESULTS =----")
+            print(f"{len(le_uuid16_result)} rows of data found in LE_bdaddr_to_UUID16s")
+            print(f"{len(seen_le_uuid16s_hash)} unique UUID16s found")
+#            print(seen_le_uuid16s_hash)
+            sorted_items = sorted(seen_le_uuid16s_hash.items(), key=lambda item: item[1], reverse=True)
+            print(f"count \t uuid16 \t company")
+            for item in sorted_items:
+                (uuid16,count) = item
+#                print(bt_member_UUID16s_to_names)
+#                print(item)
+#                print(uuid16)
+#                print(count)
+                try:
+                    decimal_uuid16 = int(uuid16,16)
+                except ValueError:
+                    if(arg != "quiet"): print(f"Skipping '{uuid16}', it can't be converted to an integer")
+                    continue
+                if(decimal_uuid16 in bt_member_UUID16s_to_names.keys()):
+                    print(f"{count} \t {uuid16} \t {bt_member_UUID16s_to_names[int(uuid16,16)]}")
+                    company_uuid_count += 1
+
+            print(f"*** {company_uuid_count} UUID16s matched a company name ***")
+
+
+def get_uuid128_stats(arg):
+    seen_btc_uuid128s_hash = {}
+    seen_le_uuid128s_hash = {}
+    known_uuid_count = 0
+
+    #Too lazy to change indentation in nano!
+    if(1):
+
+        ################################################
+        # Get the data for BTC devices from the database
+        ################################################
+
+        eir_uuid128_query = f"SELECT str_UUID128s FROM EIR_bdaddr_to_UUID128s"
+        eir_uuid128_result = execute_query(eir_uuid128_query)
+        if(len(eir_uuid128_result) != 0):
+            for (str_UUID128s,) in eir_uuid128_result:
+                if(str_UUID128s == ''):
+                    continue
+                uuid128s = str_UUID128s.split(',')
+                for uuid128 in uuid128s:
+                    if(uuid128 in seen_btc_uuid128s_hash):
+                        seen_btc_uuid128s_hash[uuid128] += 1
+                    else:
+                        seen_btc_uuid128s_hash[uuid128] = 1
+
+            print("----= BLUETOOTH CLASSIC RESULTS =----")
+            print(f"{len(eir_uuid128_result)} rows of data found in EIR_bdaddr_to_UUID128s")
+            print(f"{len(seen_btc_uuid128s_hash)} unique UUID128s found")
+#            print(seen_btc_uuid128s_hash)
+            sorted_items = sorted(seen_btc_uuid128s_hash.items(), key=lambda item: item[1], reverse=True)
+            print(f"count \t uuid128 \t\t\t\t known info")
+            for item in sorted_items:
+                (uuid128,count) = item
+#                print(item)
+#                print(uuid128)
+#                print(count)
+                if(uuid128 in custom_uuid128_hash):
+                    known_info = custom_uuid128_hash[uuid128]
+                    known_uuid_count += 1
+                else:
+                    known_info = ""
+
+                print(f"{count} \t {uuid128} \t {known_info}")
+
+            print(f"*** {known_uuid_count} UUID128s are in the custom_uuid128s.csv database ***")
+            known_uuid_count = 0
+
+            ################################################
+            # Get the data for LE devices from the database
+            ################################################
+
+            le_uuid128_query = f"SELECT str_UUID128s FROM LE_bdaddr_to_UUID128s"
+            le_uuid128_result = execute_query(le_uuid128_query)
+            if(len(le_uuid128_result) != 0):
+                for (str_UUID128s,) in le_uuid128_result:
+                    if(str_UUID128s == ''):
+                        continue
+                    if(isinstance(str_UUID128s, str)):
+                        uuid128s = str_UUID128s.split(',')
+                        for uuid128 in uuid128s:
+                            if(uuid128 in seen_le_uuid128s_hash):
+                                seen_le_uuid128s_hash[uuid128] += 1
+                            else:
+                               seen_le_uuid128s_hash[uuid128] = 1
+
+            print()
+            print("----= BLUETOOTH LOW ENERGY RESULTS =----")
+            print(f"{len(le_uuid128_result)} rows of data found in LE_bdaddr_to_UUID128s")
+            print(f"{len(seen_le_uuid128s_hash)} unique UUID128s found")
+#            print(seen_le_uuid128s_hash)
+            sorted_items = sorted(seen_le_uuid128s_hash.items(), key=lambda item: item[1], reverse=True)
+            print(f"count \t uuid128 \t\t\t\t known info")
+            for item in sorted_items:
+                (uuid128,count) = item
+#                print(item)
+#                print(uuid128)
+#                print(count)
+                if(uuid128 in custom_uuid128_hash):
+                    known_info = custom_uuid128_hash[uuid128]
+                    known_uuid_count += 1
+                else:
+                    known_info = ""
+
+                print(f"{count} \t {uuid128} \t {known_info}")
+
+            print(f"*** {known_uuid_count} UUID128s are in the custom_uuid128s.csv database ***")
+
+
 def get_bdaddrs_by_company_regex(companyregex):
     global bt_CID_to_names
     global bt_member_UUID16s_to_names
@@ -1782,6 +2048,7 @@ def print_GATT_info(bdaddr):
 def main():
     parser = argparse.ArgumentParser(description='Query device names from MySQL tables.')
     parser.add_argument('--bdaddr', type=str, required=False, help='Device bdaddr value.')
+    parser.add_argument('--bdaddrregex', type=str, default='', required=False, help='Regex to match a bdaddr value.')
     parser.add_argument('--type', type=int, default=0, help='Device name type (0 or 1) for LE tables.')
     parser.add_argument('--nameregex', type=str, default='', help='Value for REGEXP match against device_name.')
     parser.add_argument('--NOTnameregex', type=str, default='', help='Find the bdaddrs corresponding to the regexp, the same as with --nameregex, and then remove them from the final results.')
@@ -1789,9 +2056,12 @@ def main():
     parser.add_argument('--NOTcompanyregex', type=str, default='', help='Find the bdaddrs corresponding to the regexp, the same as with --companyregex, and then remove them from the final results.')
     parser.add_argument('--UUID128regex', type=str, default='', help='Value for REGEXP match against UUID128, in advertised UUID128s')
     parser.add_argument('--MSDregex', type=str, default='', help='Value for REGEXP match against Manufacturer-Specific Data (MSD)')
+    parser.add_argument('--UUID128stats', type=str, default='', help='Parse the UUID128 data, and output statistics about the most common entries ')
+    parser.add_argument('--UUID16stats', type=str, default='', help='Parse the UUID16 data, and output statistics about the most common entries ')
 
     args = parser.parse_args()
     bdaddr = args.bdaddr
+    bdaddrregex = args.bdaddrregex
     nametype = 0 # Default to non-random
     nametype = args.type
     nameregex = args.nameregex
@@ -1800,6 +2070,8 @@ def main():
     notcompanyregex = args.NOTcompanyregex
     uuid128regex = args.UUID128regex
     msdregex = args.MSDregex
+    uuid16stats = args.UUID16stats
+    uuid128stats = args.UUID128stats
 
     # Import any data from CSV files as necessary
     create_nameprint_CSV_data()
@@ -1821,7 +2093,30 @@ def main():
     else:
         bdaddrs = []
 
+    ######################################################
+    # Options to simply print statistics from the database
+    ######################################################
+
+    if(uuid16stats != ""):
+        get_uuid16_stats(uuid16stats)
+        quit() # Don't do anything other than print the stats and exit
+
+    if(uuid128stats != ""):
+        get_uuid128_stats(uuid128stats)
+        quit() # Don't do anything other than print the stats and exit
+
     print(bdaddrs)
+
+    #######################################################
+    # Options to search based on specific values or regexes
+    #######################################################
+
+    if(bdaddrregex != ""):
+        bdaddrs_tmp = get_bdaddrs_by_bdaddr_regex(bdaddrregex)
+        if(bdaddrs_tmp is not None):
+            bdaddrs += bdaddrs_tmp
+        print(f"{len(bdaddrs)} bdaddrs after bdaddrregex processing: {bdaddrs}")
+
     if(nameregex != ""):
         bdaddrs_tmp = get_bdaddrs_by_name_regex(nameregex)
         if(bdaddrs_tmp is not None):
