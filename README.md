@@ -29,9 +29,9 @@ A small form-factor x86-based PC (because currently Sweyntooth and Braktooth are
 
 * 1x - [Voltage converter](https://amzn.to/3tkTew4) - ~\$14/unit
 
-* 1x - [Plugs for voltage converter output](https://amzn.to/3RW5AoS) - ~\$4/unit
+* 1x - [Plugs for voltage converter input](https://amzn.to/3RW5AoS) - ~\$4/unit
 
-* 1x - [Plugs for voltage converter input](https://amzn.to/45wmFsu) - \$7/unit
+* 1x - [Plugs for voltage converter output](https://amzn.to/45wmFsu) - \$7/unit
 * * You then need to wire it as 12V battery -> in-plugs -> converter -> out-plugs -> UP^2
 
 ---
@@ -360,6 +360,12 @@ Of course, replace `AA:BB:CC:11:22:33` with the BLE BDADDR you want to target, a
 
 Once you have confirmed this works, you should set `ble_2thprint_enabled = True` in `~/central_app_launcher2.py`.
 
+# Script interactions & data flow
+
+Which scripts launch which other scripts, and what logs what data to where is captured in the below diagram (click for full size image.)
+
+![](./img/Blue2thprinting_script_to_data_diagram.png)
+
 # Capture Scripts Setup
 
 ### Setup automatic script execution at boot:
@@ -500,7 +506,7 @@ The oui.txt is from [https://standards-oui.ieee.org/oui/oui.txt](https://standar
 **Import BT companies into the database**:
 
 ```
-cd ~/Blue2thprinting/Analysis`
+cd ~/Blue2thprinting/Analysis
 ./translator_fill_UUID16_to_company.sh
 ```
 
